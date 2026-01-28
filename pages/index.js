@@ -14,6 +14,7 @@ export default function Home() {
           <Header title="Finley Ghosh" />
           <p>Software Engineer</p>
           <a href='https://www.linkedin.com/in/finleyghosh/'>LinkedIn</a>
+          <a href='/cv'>CV</a>
       </main>
 
       <Footer />

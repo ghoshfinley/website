@@ -1,13 +1,22 @@
 import Head from 'next/head'
 import Header from '@components/Header'
 import Footer from '@components/Footer'
-import { useRef } from 'react'
-import html2pdf from 'html2pdf.js'
+import { useRef, useEffect, useState } from 'react'
 
 export default function CV() {
   const cvRef = useRef(null)
+  const [html2pdf, setHtml2pdf] = useState(null)
 
-  const downloadPDF = () => {
+  useEffect(() => {
+    // Only import on client side
+    import('html2pdf.js').then((module) => {
+      setHtml2pdf(() => module.default)
+    })
+  }, [])
+
+  const downloadPDF = async () => {
+    if (!html2pdf) return
+    
     const element = cvRef.current
     const opt = {
       margin: 0.5,

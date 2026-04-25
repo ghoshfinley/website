@@ -9,9 +9,18 @@
   },
   "dependencies": {
     "cypress": "^13.4.0",
-    "html2pdf.js": "^0.10.1",
     "next": "^14.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.4",
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.10",
+    "tailwindcss": "^4.2.4",
+    "typescript": "^6.0.3"
   }
 }

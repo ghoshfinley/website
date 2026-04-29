@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LinkedIn Banner Generator — Finley Ghosh</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0a0a0a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      padding: 24px;
+    }
+    canvas {
+      max-width: 100%;
+      border-radius: 4px;
+      display: block;
+    }
+    .controls {
+      display: flex;
+      gap: 12px;
+    }
+    button {
+      background: #22d3ee;
+      color: #030712;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.03em;
+    }
+    button:hover { background: #06b6d4; }
+    button.secondary {
+      background: transparent;
+      color: #22d3ee;
+      border: 1px solid rgba(34,211,238,0.4);
+    }
+    button.secondary:hover { border-color: #22d3ee; }
+    p {
+      color: #4b5563;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="banner"></canvas>
+  <div class="controls">
+    <button onclick="generate()">Regenerate</button>
+    <button class="secondary" onclick="download()">Download PNG</button>
+  </div>
+  <p>1584 × 396px · LinkedIn cover photo</p>
+
+  <script>
+    const W = 1584
+    const H = 396
+    const BG = '#030712'
+    const NODE_COLOR = '#22d3ee'
+    const NODE_COUNT = 110
+    const CONNECTION_DISTANCE = 130
+    const NODE_RADIUS = 2.5
+
+    const canvas = document.getElementById('banner')
+    canvas.width = W
+    canvas.height = H
+
+    function generate() {
+      const ctx = canvas.getContext('2d')
+
+      // background
+      ctx.fillStyle = BG
+      ctx.fillRect(0, 0, W, H)
+
+      // nodes — x biased toward right (Math.pow with exponent < 1 pushes toward 1)
+      // exponent 0.38 gives sparse left ~15% of canvas, dense right ~60%
+      const nodes = Array.from({ length: NODE_COUNT }, () => ({
+        x: W * Math.pow(Math.random(), 0.38),
+        y: Math.random() * H,
+      }))
+
+      // connections
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x
+          const dy = nodes[i].y - nodes[j].y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist < CONNECTION_DISTANCE) {
+            const alpha = (1 - dist / CONNECTION_DISTANCE) * 0.45
+            ctx.beginPath()
+            ctx.moveTo(nodes[i].x, nodes[i].y)
+            ctx.lineTo(nodes[j].x, nodes[j].y)
+            ctx.strokeStyle = `rgba(34,211,238,${alpha})`
+            ctx.lineWidth = 1.2
+            ctx.stroke()
+          }
+        }
+      }
+
+      // dots
+      ctx.fillStyle = NODE_COLOR
+      for (const n of nodes) {
+        ctx.beginPath()
+        ctx.arc(n.x, n.y, NODE_RADIUS, 0, Math.PI * 2)
+        ctx.globalAlpha = 0.8
+        ctx.fill()
+      }
+      ctx.globalAlpha = 1
+    }
+
+    function download() {
+      const a = document.createElement('a')
+      a.href = canvas.toDataURL('image/png')
+      a.download = 'finley-linkedin-banner.png'
+      a.click()
+    }
+
+    generate()
+  </script>
+</body>
+</html>

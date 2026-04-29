@@ -1,8 +1,10 @@
 export default function Footer() {
+  const year = new Date().getFullYear()
   return (
-    <footer className="border-t border-gray-700 py-16 px-10 text-center">
-      <p className="text-gray-300 text-lg md:text-xl italic">
-        This site was shamelessly built with AI. That&apos;s kind of the point.
+    <footer className="py-8 px-10 text-center space-y-1">
+      <p className="text-gray-500 text-sm">Finley Ghosh &copy; {year}</p>
+      <p className="text-gray-600 text-xs italic">
+        Shamelessly built with AI. That&apos;s kind of the point.
       </p>
     </footer>
   )

@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 
 const sections = [
   { id: 'about', label: 'About' },
-  { id: 'work', label: 'Work' },
   { id: 'contact', label: 'Contact' },
 ]
 
@@ -12,31 +11,32 @@ export default function SideNav() {
   const [onHero, setOnHero] = useState(true)
 
   useEffect(() => {
-    const observers: IntersectionObserver[] = []
+    const update = () => {
+      const scrollY = window.scrollY
+      const vh = window.innerHeight
 
-    // track hero visibility for the fade
-    const hero = document.getElementById('hero')
-    if (hero) {
-      const heroObserver = new IntersectionObserver(
-        ([entry]) => setOnHero(entry.isIntersecting),
-        { threshold: 0.1 }
-      )
-      heroObserver.observe(hero)
-      observers.push(heroObserver)
+      setOnHero(scrollY < vh * 0.6)
+
+      // near bottom of page → force last section active
+      const nearBottom = scrollY + vh >= document.documentElement.scrollHeight - 50
+      if (nearBottom) {
+        setActive(sections[sections.length - 1].id)
+        return
+      }
+
+      // active = last section whose top edge has crossed 40% down the viewport
+      const threshold = scrollY + vh * 0.4
+      let current = ''
+      for (const { id } of sections) {
+        const el = document.getElementById(id)
+        if (el && el.offsetTop <= threshold) current = id
+      }
+      setActive(current)
     }
 
-    sections.forEach(({ id }) => {
-      const el = document.getElementById(id)
-      if (!el) return
-      const observer = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) setActive(id) },
-        { rootMargin: '-40% 0px -40% 0px', threshold: 0 }
-      )
-      observer.observe(el)
-      observers.push(observer)
-    })
-
-    return () => observers.forEach(o => o.disconnect())
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    return () => window.removeEventListener('scroll', update)
   }, [])
 
   const scrollTo = (id: string) => {
@@ -52,7 +52,6 @@ export default function SideNav() {
         transition: 'opacity 700ms ease',
       }}
     >
-      {/* Labels — outside the pill, aligned row-for-row with dots */}
       <div className="flex flex-col gap-2.5 py-2.5">
         {sections.map(({ id, label }) => (
           <div key={id} className="h-5 flex items-center justify-end">
@@ -70,7 +69,6 @@ export default function SideNav() {
         ))}
       </div>
 
-      {/* Pill — dots only */}
       <div
         className="flex flex-col gap-2.5 rounded-2xl py-2.5 px-3"
         style={{ background: 'rgba(255,255,255,0.07)' }}

@@ -2,12 +2,12 @@
 import { useEffect, useRef } from 'react'
 
 const NODE_COLOR = '#22d3ee'
-const MAX_NODES = 75
-const SPAWN_INTERVAL_MS = 450
-const CONNECTION_DISTANCE = 160
-const NODE_SPEED = 0.18
-const NODE_RADIUS = 3
-const FADE_IN_RATE = 0.012
+const MAX_NODES = 40
+const SPAWN_INTERVAL_MS = 700
+const CONNECTION_DISTANCE = 130
+const NODE_SPEED = 0.12
+const NODE_RADIUS = 2
+const FADE_IN_RATE = 0.008
 const FADE_OUT_FRAMES = 70
 const MIN_LIFE = 600
 const MAX_LIFE = 1400
@@ -21,7 +21,7 @@ interface Node {
   life: number
 }
 
-export default function Hero() {
+export default function RightNodes() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -54,7 +54,7 @@ export default function Hero() {
       })
     }
 
-    for (let i = 0; i < 14; i++) spawnNode()
+    for (let i = 0; i < 10; i++) spawnNode()
     spawnTimer = setInterval(spawnNode, SPAWN_INTERVAL_MS)
 
     const draw = () => {
@@ -64,7 +64,6 @@ export default function Hero() {
         node.x += node.vx
         node.y += node.vy
         node.life--
-
         if (node.life < FADE_OUT_FRAMES) {
           node.opacity = node.life / FADE_OUT_FRAMES
         } else {
@@ -81,12 +80,12 @@ export default function Hero() {
           const dist = Math.sqrt(dx * dx + dy * dy)
           if (dist < CONNECTION_DISTANCE) {
             const pairOpacity = Math.min(nodes[i].opacity, nodes[j].opacity)
-            const alpha = (1 - dist / CONNECTION_DISTANCE) * 0.4 * pairOpacity
+            const alpha = (1 - dist / CONNECTION_DISTANCE) * 0.25 * pairOpacity
             ctx.beginPath()
             ctx.moveTo(nodes[i].x, nodes[i].y)
             ctx.lineTo(nodes[j].x, nodes[j].y)
             ctx.strokeStyle = `rgba(34,211,238,${alpha})`
-            ctx.lineWidth = 1.5
+            ctx.lineWidth = 1
             ctx.stroke()
           }
         }
@@ -96,7 +95,7 @@ export default function Hero() {
       for (const node of nodes) {
         ctx.beginPath()
         ctx.arc(node.x, node.y, NODE_RADIUS, 0, Math.PI * 2)
-        ctx.globalAlpha = node.opacity * 0.8
+        ctx.globalAlpha = node.opacity * 0.5
         ctx.fill()
       }
       ctx.globalAlpha = 1
@@ -114,31 +113,10 @@ export default function Hero() {
   }, [])
 
   return (
-    <section id="hero" className="relative h-screen overflow-hidden">
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
-      <div className="relative z-10 flex flex-col justify-center h-full px-10 md:px-20">
-        <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight">
-          Finley Ghosh
-        </h1>
-        <button
-          onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
-          className="mt-3 flex items-center gap-2 text-xl md:text-2xl text-cyan-400 font-light tracking-wide cursor-pointer"
-          style={{ background: 'none', border: 'none', padding: 0 }}
-        >
-          Product Engineer
-          <span style={{ animation: 'scrollBounce 2s ease-in-out infinite', display: 'inline-block' }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          </span>
-        </button>
-      </div>
-      <style>{`
-        @keyframes scrollBounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(3px); }
-        }
-      `}</style>
-    </section>
+    <canvas
+      ref={canvasRef}
+      className="absolute top-0 right-0 h-full pointer-events-none hidden md:block"
+      style={{ width: '38%' }}
+    />
   )
 }

@@ -4,6 +4,7 @@ import About from '@components/About'
 import Contact from '@components/Contact'
 import Footer from '@components/Footer'
 import SideNav from '@components/SideNav'
+import RightNodes from '@components/RightNodes'
 
 export default function Home() {
   return (
@@ -16,9 +17,12 @@ export default function Home() {
       <div style={{ background: 'linear-gradient(to bottom, #030712 0%, #0f172a 100%)' }}>
         <SideNav />
         <Hero />
-        <About />
-        <Contact />
-        <Footer />
+        <div className="relative">
+          <RightNodes />
+          <About />
+          <Contact />
+          <Footer />
+        </div>
       </div>
     </>
   )

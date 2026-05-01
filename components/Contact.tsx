@@ -19,30 +19,31 @@ function LinkedInIcon() {
 
 export default function Contact() {
   return (
-    <section id="contact" className="py-24 px-10 md:px-20">
-      <div className="max-w-2xl">
-        <p className="text-md font-semibold tracking-widest text-cyan-400 uppercase mb-8">
-          Get in Contact
+    <section id="contact" className="py-16 px-10 md:px-20">
+      <div className="max-w-3xl">
+        <p className="text-xs font-semibold tracking-widest text-cyan-400 uppercase mb-8">
+          Contact
         </p>
         <p className="text-gray-300 text-lg mb-8">
-          If something here clicks, I&apos;d like to hear what you&apos;re working on.
+          I am at my best in the <strong className="font-bold text-white">0 to 1 phase of something novel, creative solutions and making the end result something people actually want to use.</strong>
         </p>
+        <p className="text-gray-300 text-lg mb-8">If that sounds like where you are, get in touch.</p>
         <div className="flex gap-3">
           <a
             href="mailto:finley@finleyghosh.com"
-            aria-label="Email"
-            className="text-cyan-400 hover:text-cyan-300 transition-colors border border-cyan-400/30 hover:border-cyan-400/60 rounded-lg p-3"
+            className="flex items-center gap-2.5 text-cyan-400 hover:text-cyan-300 transition-colors border border-cyan-400/30 hover:border-cyan-400/60 rounded-lg px-4 py-3 text-sm font-medium"
           >
             <MailIcon />
+            Email
           </a>
           <a
             href="https://www.linkedin.com/in/finleyghosh/"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="LinkedIn"
-            className="text-cyan-400 hover:text-cyan-300 transition-colors border border-cyan-400/30 hover:border-cyan-400/60 rounded-lg p-3"
+            className="flex items-center gap-2.5 text-cyan-400 hover:text-cyan-300 transition-colors border border-cyan-400/30 hover:border-cyan-400/60 rounded-lg px-4 py-3 text-sm font-medium"
           >
             <LinkedInIcon />
+            LinkedIn
           </a>
         </div>
       </div>

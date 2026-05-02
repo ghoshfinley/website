@@ -21,7 +21,7 @@ export default function About() {
         </p>
         <p className="font-bold text-white">
         I am particularly interested in early stage companies where the product is the thing,
-        not support for the thing. If that is you, let&apos;s talk.
+        not support for the thing.
       </p>
       </div>
     </section>

@@ -54,6 +54,10 @@
 <body>
   <div class="previews">
     <div class="preview">
+      <canvas id="c256" width="256" height="256" style="width:128px;height:128px;"></canvas>
+      <span class="label">256 × 256</span>
+    </div>
+    <div class="preview">
       <canvas id="c48" width="48" height="48" style="width:96px;height:96px;"></canvas>
       <span class="label">48 × 48</span>
     </div>
@@ -75,7 +79,7 @@
 
   <script>
     const BG = '#030712'
-    const SIZES = [48, 32, 16]
+    const SIZES = [256, 48, 32, 16]
 
     function drawIcon(canvas) {
       const S = canvas.width
@@ -107,15 +111,7 @@
     }
 
     function generate() {
-      const master = document.getElementById('c48')
-      drawIcon(master)
-      // scale 48 down to 32 and 16
-      ;[32, 16].forEach(size => {
-        const dst = document.getElementById('c' + size)
-        const ctx = dst.getContext('2d')
-        ctx.clearRect(0, 0, size, size)
-        ctx.drawImage(master, 0, 0, size, size)
-      })
+      SIZES.forEach(size => drawIcon(document.getElementById('c' + size)))
     }
 
     async function downloadIco() {

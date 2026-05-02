@@ -27,7 +27,7 @@
       align-items: center;
       gap: 8px;
     }
-    canvas { display: block; image-rendering: pixelated; border-radius: 16%; }
+    canvas { display: block; image-rendering: pixelated; border-radius: 50%; }
     .label { color: #4b5563; font-size: 11px; }
     .controls { display: flex; gap: 10px; }
     button {
@@ -80,24 +80,30 @@
     function drawIcon(canvas) {
       const S = canvas.width
       const ctx = canvas.getContext('2d')
+      const cx = S / 2, cy = S / 2, r = S / 2
 
+      ctx.clearRect(0, 0, S, S)
+
+      // circle background
+      ctx.beginPath()
+      ctx.arc(cx, cy, r, 0, Math.PI * 2)
       ctx.fillStyle = BG
-      ctx.fillRect(0, 0, S, S)
+      ctx.fill()
 
+      // teal ring
+      ctx.beginPath()
+      ctx.arc(cx, cy, r - Math.max(1, S * 0.03), 0, Math.PI * 2)
+      ctx.strokeStyle = 'rgba(34,211,238,0.5)'
+      ctx.lineWidth = Math.max(1, S * 0.04)
+      ctx.stroke()
 
-      const fontSize = Math.round(S * 0.46)
+      // FG text
+      const fontSize = Math.round(S * 0.58)
       ctx.font = `700 ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-
-      if (S >= 32) {
-        ctx.shadowColor = 'rgba(34,211,238,0.3)'
-        ctx.shadowBlur = S * 0.07
-      }
-
       ctx.fillStyle = '#ffffff'
-      ctx.fillText('FG', S / 2, S / 2)
-      ctx.shadowBlur = 0
+      ctx.fillText('FG', cx, cy)
     }
 
     function generate() {

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FG Favicon Generator — Finley Ghosh</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0a0a0a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      padding: 24px;
+    }
+    .previews {
+      display: flex;
+      align-items: flex-end;
+      gap: 20px;
+    }
+    .preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    canvas { display: block; image-rendering: pixelated; border-radius: 16%; }
+    .label { color: #4b5563; font-size: 11px; }
+    .controls { display: flex; gap: 10px; }
+    button {
+      background: #22d3ee;
+      color: #030712;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.03em;
+    }
+    button:hover { background: #06b6d4; }
+    button.secondary {
+      background: transparent;
+      color: #22d3ee;
+      border: 1px solid rgba(34,211,238,0.4);
+    }
+    button.secondary:hover { border-color: #22d3ee; }
+    p { color: #4b5563; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="previews">
+    <div class="preview">
+      <canvas id="c48" width="48" height="48" style="width:96px;height:96px;"></canvas>
+      <span class="label">48 × 48</span>
+    </div>
+    <div class="preview">
+      <canvas id="c32" width="32" height="32" style="width:64px;height:64px;"></canvas>
+      <span class="label">32 × 32</span>
+    </div>
+    <div class="preview">
+      <canvas id="c16" width="16" height="16" style="width:32px;height:32px;"></canvas>
+      <span class="label">16 × 16</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button onclick="generate()">Regenerate</button>
+    <button class="secondary" onclick="downloadIco()">Download favicon.ico</button>
+  </div>
+  <p>Contains 16 × 16, 32 × 32, 48 × 48</p>
+
+  <script>
+    const BG = '#030712'
+    const SIZES = [48, 32, 16]
+
+    function drawIcon(canvas) {
+      const S = canvas.width
+      const ctx = canvas.getContext('2d')
+
+      ctx.fillStyle = BG
+      ctx.fillRect(0, 0, S, S)
+
+
+      const fontSize = Math.round(S * 0.46)
+      ctx.font = `700 ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+
+      if (S >= 32) {
+        ctx.shadowColor = 'rgba(34,211,238,0.3)'
+        ctx.shadowBlur = S * 0.07
+      }
+
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText('FG', S / 2, S / 2)
+      ctx.shadowBlur = 0
+    }
+
+    function generate() {
+      const master = document.getElementById('c48')
+      drawIcon(master)
+      // scale 48 down to 32 and 16
+      ;[32, 16].forEach(size => {
+        const dst = document.getElementById('c' + size)
+        const ctx = dst.getContext('2d')
+        ctx.clearRect(0, 0, size, size)
+        ctx.drawImage(master, 0, 0, size, size)
+      })
+    }
+
+    async function downloadIco() {
+      const canvases = SIZES.map(s => ({ size: s, canvas: document.getElementById('c' + s) }))
+
+      const pngBuffers = await Promise.all(
+        canvases.map(({ canvas }) =>
+          new Promise(resolve => {
+            canvas.toBlob(blob => blob.arrayBuffer().then(resolve), 'image/png')
+          })
+        )
+      )
+
+      const count = SIZES.length
+      const headerSize = 6
+      const dirEntrySize = 16
+      let imageOffset = headerSize + count * dirEntrySize
+
+      const totalSize = imageOffset + pngBuffers.reduce((s, b) => s + b.byteLength, 0)
+      const buffer = new ArrayBuffer(totalSize)
+      const view = new DataView(buffer)
+
+      // ICONDIR
+      view.setUint16(0, 0, true)      // reserved
+      view.setUint16(2, 1, true)      // type: ICO
+      view.setUint16(4, count, true)  // image count
+
+      // ICONDIRENTRY per size
+      pngBuffers.forEach((png, i) => {
+        const s = SIZES[i]
+        const e = headerSize + i * dirEntrySize
+        view.setUint8(e,     s === 256 ? 0 : s) // width
+        view.setUint8(e + 1, s === 256 ? 0 : s) // height
+        view.setUint8(e + 2, 0)                 // colorCount
+        view.setUint8(e + 3, 0)                 // reserved
+        view.setUint16(e + 4, 1, true)          // planes
+        view.setUint16(e + 6, 32, true)         // bitCount
+        view.setUint32(e + 8, png.byteLength, true)  // size
+        view.setUint32(e + 12, imageOffset, true)    // offset
+        imageOffset += png.byteLength
+      })
+
+      // PNG image data
+      let offset = headerSize + count * dirEntrySize
+      pngBuffers.forEach(png => {
+        new Uint8Array(buffer, offset).set(new Uint8Array(png))
+        offset += png.byteLength
+      })
+
+      const blob = new Blob([buffer], { type: 'image/x-icon' })
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(blob)
+      a.download = 'favicon.ico'
+      a.click()
+    }
+
+    generate()
+  </script>
+</body>
+</html>
